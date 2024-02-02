@@ -27,7 +27,7 @@ router.get("/" ,async(req,res) => {
             }
            
         }else{
-            res.status(400).json({ error: 'formato id invalido' })
+            return res.send((await manager.getProducts()))
         }
         
     } catch (error) {
