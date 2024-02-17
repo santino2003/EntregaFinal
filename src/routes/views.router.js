@@ -1,5 +1,5 @@
 const {Router} = require("express")
-const ProductManager = require('../ProductManager')
+const ProductManager = require('../dao/ProductManager')
 const paths = require("path")
 
 const router = Router();
@@ -20,6 +20,9 @@ router.get("/realtimeproducts", async (req, res) => {
  res.render("realTimeProducts", {})
 })
 
+router.get("/chat",async(req,res)=>{
+  res.render("chat", {})
+})
 
 
 

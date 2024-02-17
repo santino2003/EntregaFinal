@@ -1,35 +1,38 @@
 const socket = io();
-const listaProductos = document.getElementById("products")
-const formulario = document.getElementById('formulario')
 
-socket.on("productos", (data) =>{
-    
-        let productos = []
-        
-        data.forEach(producto =>{
-            productos.push(producto.title)
 
-        })
-        listaProductos.innerHTML = `<p>${productos}</p>`
-        
-   
-});
+let user
 
-formulario.addEventListener('submit',(e)=>{
-    e.preventDefault()
-    const title = document.getElementById('title').value
-    const description =  document.getElementById('description').value
-    const price =  document.getElementById('price').value
-    const code =  document.getElementById('code').value
-    const stock =  document.getElementById('stock').value
-    const category =  document.getElementById('category').value
-    const status =  document.getElementById('status').checked
-    const objeto = {title: title,description : description,price :price,code : code,stock : stock,category :category,status: status}
-    
-    socket.emit('form', objeto)
-    
+const chatBox = document.getElementById('chat-box')
+Swal.fire({
+    title: "Ingrese su nombre",
+    input: "text",
+    text: "Ingrese el usuaruio para identificarse en el chat",
+    inputValidator: (value) => {
+        return !value && "Necesita ingresar nombre de usuario"
+    },
+    allowOutsideClick: false
+}).then((result) => {
+    user = result.value
 })
 
+chatBox.addEventListener("keyup",(e)=>{
+    if(e.key== "Enter"){
+        if(chatBox.value.trim().length){
+            socket.emit("message",{user, message: chatBox.value});
+            chatBox.value = ""
+        }
+    }
+})
 
+socket.on('messageLogs', (data)=>{
+    const logs = document.getElementById("message-logs");
+    let messages = ""
 
+    data.forEach(obj => {
+        messages += `<p>${obj.user} dice: ${obj.message}</p>`
+        messages
+    });
 
+    logs.innerHTML = messages
+})

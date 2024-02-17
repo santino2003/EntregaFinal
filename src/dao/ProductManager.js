@@ -107,7 +107,7 @@ class ProductManager{
                 await fs.writeFile(this.pathDB, JSON.stringify(allProducts))
 
             }else{
-                return error(400)
+                return null
             }
         } catch (error) {
             console.log(error)

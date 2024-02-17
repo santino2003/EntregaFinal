@@ -5,7 +5,11 @@ const { Server } = require( "socket.io");
 const viewsRouter = require( "./routes/views.router.js")
 const productsRoutes = require("./routes/product.routes")
 const cartRoutes = require("./routes/cart.routes")
-const ProductManager = require('./ProductManager')
+const ProductManager = require('./dao/ProductManager.js')
+const mongoose = require('mongoose');
+const chatModel = require("./dao/models/chat.model")
+
+
 
 const pathBase = path.join(__dirname, '/routes/db.json')
 const manager = new ProductManager(pathBase)
@@ -33,45 +37,66 @@ app.use("/", viewsRouter);
 
 
 
-  
-let productos; // Declarar la variable en un ámbito superior
-  
-  async function obetenerProductos() {
-    try {
+// Conectar a la base de datos
+mongoose.connect('mongodb+srv://santinopeiretti2003:Dexter2003_@cluster0.hrrs9yt.mongodb.net/Moonshop?retryWrites=true&w=majority', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => {
+  console.log("Conexión exitosa a la base de datos");
+})
+.catch(err => {
+  console.error("Error al conectar a la base de datos:", err);
+  process.exit();
+});
 
-      const arrayObtenido = await manager.getProducts();
+
+
+
+
+// let productos; // Declarar la variable en un ámbito superior
+  
+//   async function obetenerProductos() {
+//     try {
+
+//       const arrayObtenido = await manager.getProducts();
   
 
-      productos = arrayObtenido.products
+//       productos = arrayObtenido.products
   
-    } catch (error) {
-      console.error('Error al manipular el array:', error);
+//     } catch (error) {
+//       console.error('Error al manipular el array:', error);
 
-    }
-  }
+//     }
+//   }
   
   
-  (async () => {
+//   (async () => {
     
-    try {
-      await obetenerProductos();
+//     try {
+//       await obetenerProductos();
 
-    } catch (error) {
+//     } catch (error) {
       
-      console.error('Error en la operación:', error);
-    }
-  })();
+//       console.error('Error en la operación:', error);
+//     }
+//   })();
+
 
 
 io.on("connection",  (socket) => {
-    
-    socket.emit("productos",productos )
-    socket.on('form',(data)=>{
-        console.log((data))
-        const {title,description,price,code,stock,category,status} = data
-        manager.addProduct(title,description,price,code,stock,category,status)
+     chatModel.find().then((messages)=>{
+        socket.emit('messageLogs',messages)
+        socket.on('message',(data)=>{
+          chatModel.create(data)
+          chatModel.find().then((messages)=>{
+            io.emit("messageLogs", messages)
+          })
+          
+        })
+        
     })
-      
+    
 
     
 })  
