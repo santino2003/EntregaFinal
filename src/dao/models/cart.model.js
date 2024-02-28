@@ -2,10 +2,20 @@ const mongoose = require('mongoose');
 
 
 const pedidoEsquema = new mongoose.Schema({
-  products: [{
-    Prodid: String,
-    quantity: Number
-  }], 
+  products:{
+      type:[
+        {
+          product: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "products"
+          },
+          quantity:{
+            type:Number
+          }
+        }
+    ]
+    }
+
 });
 
 

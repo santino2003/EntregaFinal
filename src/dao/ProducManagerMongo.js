@@ -1,8 +1,9 @@
 const productModel = require("../dao/models/product.model")
 class ProductManagerMongo{
-    async getProducts () {
+    async getProducts (filtro,demasQueris) {
         try {
-            const products = await productModel.find({})
+            
+            const products = await productModel.paginate(filtro,demasQueris)
             return products
         } catch (error) {
             return(error)

@@ -3,6 +3,7 @@ const ProductManager = require('../dao/ProductManager')
 const ProductManagerMongo = require('../dao/ProducManagerMongo')
 const paths = require("path")
 const multer = require('multer');
+const { Query } = require("mongoose");
 
 
 const upload = multer()
@@ -14,25 +15,69 @@ const router = Router()
 
 router.get("/" ,async(req,res) => {
     try {
-        bool = req.query.hasOwnProperty("limit")
-        console.log(bool)
-        const numero = parseInt(req.query.limit,10)
+
+        let  {limit =4, page = 1, query = {},sort ={},} = req.query
         
-    
-        if(!isNaN(numero) && bool ){
-            allProducts = await managerMongo.getProducts()
+        if(Object.keys(query).length !== 0){
+            const parts = query.split(':').map(part => part.replace(/"/g, '').trim());
+
+            // Crear un objeto usando las partes
+            query = { [parts[0]]: parts[1] };
             
-            if(allProducts.length >= numero ){
-                
-                return res.send(allProducts.slice(0, numero))
-                
-            }else{
-                return res.send((await managerMongo.getProducts()))
-            }
-           
-        }else{
-            return res.send((await managerMongo.getProducts()))
         }
+        if(sort == 1){
+            sort = {price:1}
+            
+        }else if(sort == -1){
+            sort = {price:-1}
+            
+        }
+
+
+        
+        const {
+            docs,
+            totalDocs,
+            limit:limitPag,
+            totalPages,
+            hasNextPage,
+            hasPrevPage,
+            nextPage,
+            prevPage
+        
+
+        } = await managerMongo.getProducts(query,{page,limit,sort})
+        
+        
+        let prevLink
+        let nextLink
+    
+        if(hasPrevPage){
+            prevLink = `/api/products?page=${prevPage}`
+        }
+        else{
+            prevLink = null
+        }
+        if(hasNextPage){
+            nextLink = `/api/products?page=${nextPage}`}
+        else{
+            nextLink = null
+        }
+
+        return res.json({
+            status:"success",
+            payload: docs,
+            totalPages,
+            prevPage,
+            nextPage,
+            page,
+            hasPrevPage,
+            hasNextPage,
+            prevLink,
+            nextLink
+           
+        })
+
         
     } catch (error) {
         console.log(error)
@@ -87,6 +132,7 @@ router.post("/",upload.none(),async (req,res) =>{
         category,
         status,
         thumbnail } = req.body
+    
     
     if(thumbnail === undefined){
         thumbnail = "SIN FOTO"

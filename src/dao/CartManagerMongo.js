@@ -3,13 +3,64 @@ class CartManagerMongo{
 
     async getProductsCart(id){
         try {
-            const cart = await cartModel.findOne({_id: id},{products:1})
+            const cart = await cartModel.find({})
+            .populate('products.product')
+            
         
-            return (cart.products)
+            return (cart)
         } catch (error) {
             console.log(error)
         }
       
+    }
+    async emptyCart(idCart){ 
+        const cart = await cartModel.findOne({_id: idCart})
+        cart.products = []
+        await cartModel.updateOne({_id:idCart},cart)
+    }
+
+    async updateProductQuantity(idCart,idProduct,quantity){
+        const cart = await cartModel.findOne({_id: idCart})
+        if (cart){
+            const product = cart.products.find(product => (product.product).toString() === idProduct)
+            console.log("primer if")
+            if (product){
+                product.quantity = quantity + product.quantity
+                console.log(product)
+
+                await cartModel.updateOne({_id:idCart},cart)
+            }
+
+        }
+    }
+
+    async delteProducts(idCart,idProduct){
+        const cart = await cartModel.findOne({_id: idCart})
+        
+        
+        if (cart){
+            const product = cart.products.find(product => (product.product).toString() === idProduct)
+            
+            if (product){
+                if((product.quantity) > 1){
+                    product.quantity -= 1
+                    
+                    await cartModel.updateOne({_id:idCart},cart)
+                }
+                    
+                else{
+                    const index = cart.products.indexOf(product)
+                    cart.products.splice(index, 1)
+                    await cartModel.updateOne({_id:idCart},cart)
+                    
+                }
+            }
+            else{
+            return(error(404))}
+            
+           
+        
+        }
     }
     async createCart(){
        try {
@@ -25,33 +76,28 @@ class CartManagerMongo{
         const cart = await cartModel.findOne({_id: idCart})
         
         if (cart){
-            const product = cart.products.find(product => product.Prodid === idProduct)
+            const product = cart.products.find(product => (product.product).toString() === idProduct)
             
             if (product){
-                const nuevaCantidad = (product.quantity += 1)
-                await cartModel.findOneAndUpdate(
-                    { _id: idCart, 'products.Prodid': idProduct},
-                    { $set: { 'products.$.quantity': nuevaCantidad } },
-                    {new: true}
-                )   
+                product.quantity += 1
+
+                await cartModel.updateOne({_id:idCart},cart)
+                
             }else{
                 const productoNuevo = {
-                    Prodid: idProduct,
+                    product: idProduct,
                     quantity: 1
                 }
 
 
-                await cartModel.findOneAndUpdate(
-                    { _id: idCart },
-                    { $push: { products: productoNuevo } },
-                    { new: true }
-                )
-
-                
+                cart.products.push(productoNuevo)
+                await cartModel.updateOne({_id:idCart},cart)
             }
         }else{
             return(error(404))
         }
+
     }
+
 }
 module.exports = CartManagerMongo

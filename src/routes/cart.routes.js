@@ -8,7 +8,7 @@ const multer = require('multer');
 const ProductManagerMongo = require("../dao/ProducManagerMongo");
 
 
-const upload = multer()
+const upload = multer().none()
 
 
 const managerMongo = new ProductManagerMongo
@@ -44,8 +44,6 @@ router.post("/:cid/product/:pid",async(req,res)=>{
  
         const cid = req.params.cid
         const pid = req.params.pid
-        console.log(cid)
-        console.log(pid)
         if(cid !== undefined && pid !== undefined){
             const producto  = await managerMongo.getProductById(pid)
             if(producto){
@@ -72,6 +70,46 @@ router.post("/:cid/product/:pid",async(req,res)=>{
     } catch (error) {
         console.log(error)
     }
+    router.delete("/:cid",async(req, res)=>{
+        try {
+            const id = req.params.cid
+            
+            res.send(await cartManagerMongo.emptyCart(id))
+            
+        } catch (error) {
+            console.log(error)
+        }
+        
+    })
+    router.put("/:cid/product/:pid",upload,async (req,res)=>{
+        const cid = req.params.cid
+        const pid = req.params.pid
+        const quantity = req.body.quantity
+        console.log(quantity)
+
+        res.send(await cartManagerMongo.updateProductQuantity(cid,pid,quantity))
+
+    })
+
+
+
+    router.delete("/:cid/product/:pid",async (req,res)=>{
+        try {
+            const cid = req.params.cid
+            const pid = req.params.pid
+            const producto  = await managerMongo.getProductById(pid)
+            res.send(await cartManagerMongo.delteProducts(cid,pid))
+            const modificacion = {
+                stock: producto.stock + 1
+            }
+            managerMongo.updateProduct(pid,modificacion)
+            res.send(await cartManagerMongo.addProductToCart(cid,pid))
+        } catch (error) {
+            console.log(error)
+        }
+
+
+    })
 })
 
 module.exports = router
