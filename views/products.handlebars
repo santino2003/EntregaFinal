@@ -1,4 +1,5 @@
 <div>
+  <h1>Bienvenido {{name}}</h1>
   <h1>Productos</h1>
   {{#each docs}}
     <p>name: {{this.title}}</p>
@@ -25,4 +26,11 @@
     <a href="/products?page={{nextPage}}"><button
       >Siguiente</button></a>
   {{/if}}
+
+  <div>
+    <form action="/api/session/logout" method="get">
+      <br />
+      <button type="submit">logout</button>
+    </form>
+  </div>
 </div>

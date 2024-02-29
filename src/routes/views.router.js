@@ -9,6 +9,9 @@ const pathBase = paths.join(__dirname, 'db.json')
 const manager = new ProductManager(pathBase)
 const producManagerMongo = new ProductManagerMongo
 const cartManagerMongo = new CartManagerMongo
+const authMdw = require("../dao/middleware/auth.middleware");
+
+
 
 router.get("/", async (req, res) => {
    allProducts = await manager.getProducts()
@@ -33,10 +36,12 @@ router.get("/chat",async(req,res)=>{
 })
 
 
-router.get("/products",async(req,res)=>{
+router.get("/products",authMdw ,async(req,res)=>{
   const { page = 1 } = req.query;
   const { docs, hasPrevPage, hasNextPage, nextPage, prevPage } =
     await productModel.paginate({}, { limit: 5, page, lean: true });
+  const name = req.session.user._doc.first_name
+  console.log(name)
   res.render(`products`, {
     docs,
     page,
@@ -44,10 +49,11 @@ router.get("/products",async(req,res)=>{
     hasNextPage,
     nextPage,
     prevPage,
+    name
   });
 });
 
-router.get("/product/:pid",async(req,res)=>{
+router.get("/product/:pid", authMdw ,async(req,res)=>{
   const id = (req.params.pid)
   
   const producto = await producManagerMongo.getProductById(id)
@@ -57,7 +63,7 @@ router.get("/product/:pid",async(req,res)=>{
 
 });
 
-router.get("/carts/:cid",async(req,res)=>{
+router.get("/carts/:cid",authMdw,async(req,res)=>{
     id = req.params
     const products = await cartManagerMongo.getProductsCart(id)
     const arrayProductos = products[0].products
@@ -65,5 +71,26 @@ router.get("/carts/:cid",async(req,res)=>{
     
     res.render(`cart`,{arrayProductos})
 });
+
+
+
+router.get(`/login`, async (req, res) => {
+  res.render("login");
+});
+
+router.get(`/register`, async (req, res) => {
+  res.render("register");
+});
+
+router.get(`/profile`, authMdw, async (req, res) => {
+  const user = req.session.user;
+
+  res.render("profile", {
+    user,
+  });
+});
+
+module.exports = router;
+
 
 module.exports = router
