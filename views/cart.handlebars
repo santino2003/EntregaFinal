@@ -1,0 +1,13 @@
+<div>
+  <h1>Productos</h1>
+  {{#each arrayProductos}}
+      <script>
+    // Accede a los datos pasados desde el servidor y realiza un console log
+    console.log({{ "hola" }});
+    </script>
+    <p>name: {{this.product.title}}</p>
+    <p>quantity: {{this.quantity}}</p>
+    <p>unit price: {{this.product.price}}</p>
+    <p>-----------------</p>
+  {{/each}}
+</div>

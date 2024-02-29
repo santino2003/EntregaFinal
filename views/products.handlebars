@@ -1,10 +1,12 @@
 <div>
-  <h1>Lista de estudiantes</h1>
+  <h1>Productos</h1>
   {{#each docs}}
     <p>name: {{this.title}}</p>
     <p>price {{this.price}}</p>
     <a href="#" onclick="document.getElementById('addToCartForm{{this._id}}').submit()">AddToCart</a>
     <form id="addToCartForm{{this._id}}" action="/api/carts/65df6968de6283e26a8c3491/product/{{this._id}}" method="POST" style="display: none;"></form>
+    <a href="#" onclick="document.getElementById('info{{this._id}}').submit()">Detalles</a>
+    <form id="info{{this._id}}" action="/product/{{this._id}}" method="GET" style="display: none;"></form>
     <p>-----------------</p>
   {{/each}}
 

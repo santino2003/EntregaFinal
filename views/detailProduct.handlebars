@@ -1,0 +1,12 @@
+<div>
+  <h1>Productos</h1>
+    <p>name: {{producto.title}}</p>
+    <p>price: {{producto.price}}</p>
+    <p>code: {{producto.code}}</p>
+    <p>stock: {{producto.stock}}</p>
+    <p>category: {{producto.category}}</p>
+    <p></p>
+    <a href="#" onclick="document.getElementById('addToCart{{producto._id}}').submit()">AddToCart</a>
+    <form id="addToCart{{producto._id}}" action="/api/carts/65df6968de6283e26a8c3491/product/{{producto._id}}" method="POST" style="display: none;"></form>
+    <p>-----------------</p>
+</div>

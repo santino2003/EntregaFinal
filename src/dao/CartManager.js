@@ -29,7 +29,7 @@ class CartManager{
             
             if(cartFind){
                 
-                return cartFind.products;
+                return cartFind.products[0];
 
             }else{
                 return error(404)

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
+const mongoosePaginateV2 = require("mongoose-paginate-v2")
 
-
-const pedidoEsquema = new mongoose.Schema({
+const pedidoSchema = new mongoose.Schema({
   products:{
       type:[
         {
@@ -18,7 +18,7 @@ const pedidoEsquema = new mongoose.Schema({
 
 });
 
-
-const cartModel = mongoose.model('carts', pedidoEsquema);
+pedidoSchema.plugin(mongoosePaginateV2)
+const cartModel = mongoose.model('carts',pedidoSchema);
 
 module.exports = cartModel;
