@@ -10,6 +10,7 @@ const manager = new ProductManager(pathBase)
 const producManagerMongo = new ProductManagerMongo
 const cartManagerMongo = new CartManagerMongo
 const authMdw = require("../dao/middleware/auth.middleware");
+const passport = require("passport");
 
 
 
@@ -74,23 +75,60 @@ router.get("/carts/:cid",authMdw,async(req,res)=>{
 
 
 
-router.get(`/login`, async (req, res) => {
+// Login - GET
+router.get("/login", async (req, res) => {
   res.render("login");
 });
 
-router.get(`/register`, async (req, res) => {
+// Login - POST
+router.post(
+  "/login",
+  passport.authenticate("login", {
+    successRedirect: "/",
+    failureRedirect: "/faillogin",
+    failureFlash: true, // Display flash messages if needed
+  })
+);
+
+router.get("/faillogin", async (req, res) => {
+  res.send({ error: "login strategy failed" });
+});
+
+// Register - GET
+router.get("/register", async (req, res) => {
   res.render("register");
 });
 
-router.get(`/profile`, authMdw, async (req, res) => {
-  const user = req.session.user;
+// Register - POST
+router.post(
+  "/register",
+  passport.authenticate("register", {
+    successRedirect: "/",
+    failureRedirect: "/failregister",
+    failureFlash: true,
+  })
+);
+
+router.get("/failregister", async (req, res) => {
+  res.send({ error: "register strategy failed" });
+});
+
+router.get("/recover", async (req, res) => {
+  res.render("recover");
+});
+
+router.get("/profile", authMdw, async (req, res) => {
+  const user = req.user;
+  console.log("🚀 ~ file: views.routes.js:20 ~ router.get ~ user:", user);
 
   res.render("profile", {
     user,
+    carrito: {
+      carritoId: "carrito-1",
+      productos: [{ productoId: "1", nombre: "camisa" }],
+    },
   });
 });
-
-module.exports = router;
 
 
 module.exports = router

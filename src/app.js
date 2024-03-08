@@ -17,6 +17,10 @@ const session = require("express-session");
 const pathBase = path.join(__dirname, '/routes/db.json')
 const manager = new ProductManager(pathBase)
 
+const passport = require("passport");
+const initializePassport = require("./config/passport.config");
+
+
 const app = express()
 
 const PORT = 8080
@@ -24,6 +28,7 @@ const PORT = 8080
 const API_PREFIX = "/api"
 const SECRET_SESSION = "secretSession";
 
+app.use(cookieParser());
 app.use(
   session({
     store: mongoStore.create({
@@ -31,11 +36,15 @@ app.use(
       mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
       ttl: 60 * 3600,
     }),
-    secret: SECRET_SESSION,
+    secret: "secretSession",
     resave: false,
     saveUninitialized: false,
   })
 );
+
+initializePassport();
+app.use(passport.initialize());
+app.use(passport.session())
 
 
 const httpServer = app.listen(PORT, () => console.log(`Listening on port ${PORT}`))
@@ -59,7 +68,7 @@ app.use(API_PREFIX + "/session/", sessionRoutes)
 app.use("/", viewsRouter);
 
 
-app.use(cookieParser());
+
 
 
 // Conectar a la base de datos

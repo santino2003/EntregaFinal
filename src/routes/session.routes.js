@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const userModel = require("../dao/models/user.model");
 const { listenerCount } = require("../dao/models/cart.model");
+const { createHash, isValidPasswd } = require("../utils/encrypt");
 
 const router = Router();
 
@@ -14,19 +15,20 @@ router.get("/logout", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    const session = req.session;
-    console.log(
-      session
-    );
+
 
     const findUser = await userModel.findOne({ email });
 
     if (!findUser) return res.json({ message: `user not register` });
 
-    if (findUser.password !== password) {
+    const isValidComparePsw = await isValidPasswd(password, findUser.password);
+
+    if (!isValidComparePsw) {
       return res.json({ message: `wrong password` });
     }
 
+  
+   
     req.session.user = {
   
       ...findUser,
@@ -42,18 +44,19 @@ router.post("/login", async (req, res) => {
 
 router.post("/register", async (req, res) => {
   try {
-    console.log("BODY REGISTER***", req.body);
     const { first_name, last_name, email, age, password } = req.body;
     let isAdmin = false
     if(email == "adminCoder@coder.com"){
       isAdmin = true
     }
+
+    const pswHashed = await createHash(password);
     const addUser = {
       first_name,
       last_name,
       email,
       age,
-      password,
+      password: pswHashed,
       isAdmin
     };
 
@@ -69,6 +72,36 @@ router.post("/register", async (req, res) => {
     return res.redirect("/login");
   } catch (error) {
 
+    console.log(
+      error
+    );
+  }
+});
+
+router.post("/recover-psw", async (req, res) => {
+  try {
+    const { new_password, email } = req.body;
+  
+
+    const newPswHash = await createHash(new_password);
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
+      return res
+        .status(401)
+        .json({ message: `credenciales invalidas o erroneas` });
+    }
+
+    const updateUser = await userModel.findByIdAndUpdate(user._id, {
+      password: newPswHash,
+    });
+
+    if (!updateUser) {
+      return res.json({ message: "problemas actualizando la contrasena" });
+    }
+
+    return res.render("login");
+  } catch (error) {
     console.log(
       error
     );
