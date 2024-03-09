@@ -39,10 +39,11 @@ router.get("/chat",async(req,res)=>{
 
 router.get("/products",authMdw ,async(req,res)=>{
   const { page = 1 } = req.query;
+  // console.log("imprimir sesion products",req.session)
   const { docs, hasPrevPage, hasNextPage, nextPage, prevPage } =
     await productModel.paginate({}, { limit: 5, page, lean: true });
   const name = req.session.user._doc.first_name
-  console.log(name)
+  
   res.render(`products`, {
     docs,
     page,
@@ -84,7 +85,7 @@ router.get("/login", async (req, res) => {
 router.post(
   "/login",
   passport.authenticate("login", {
-    successRedirect: "/",
+    successRedirect: "/products",
     failureRedirect: "/faillogin",
     failureFlash: true, // Display flash messages if needed
   })
@@ -103,7 +104,7 @@ router.get("/register", async (req, res) => {
 router.post(
   "/register",
   passport.authenticate("register", {
-    successRedirect: "/",
+    successRedirect: "/login",
     failureRedirect: "/failregister",
     failureFlash: true,
   })

@@ -2,7 +2,7 @@ const passport = require("passport");
 const local = require("passport-local");
 const userModel = require("../dao/models/user.model");
 const {createHash, isValidPasswd } = require("../utils/encrypt");
-
+const GithubStrategy = require("passport-github2")
 const localStrategy = local.Strategy;
 
 const initializePassport = () => {
@@ -37,6 +37,8 @@ const initializePassport = () => {
 
           const newUser = await userModel.create(addUser);
 
+          req.session.user = { email, firstName: first_name, lastName: last_name }
+          console.log( "entre passport",req.session.user)
           if (!newUser) {
             return res
               .status(500)
@@ -55,12 +57,13 @@ const initializePassport = () => {
     "login",
     new localStrategy(
       {
+        passReqToCallback: true,
         usernameField: "email",
       },
-      async (username, password, done) => {
+      async (req, username, password, done) => {
         try {
           const user = await userModel.findOne({ email: username });
-          console.log("ingrese")
+          
           if (!user) {
             return done(null, false);
           }
@@ -69,12 +72,54 @@ const initializePassport = () => {
           if (!isValidPasswd(password, user.password)) {
             return done(null, false);
           }
+          req.session.user = {
+  
+            ...user,
+          };
+      
 
           return done(null, user);
         } catch (error) {
           console.log(error);
 
-          return done(error);
+          // return done(error);
+        }
+      }
+    )
+  );
+  passport.use(
+    "github",
+    new GithubStrategy(
+      {
+        clientID: "7e0b7c5237a77e4ee90e",
+        clientSecret: "fbcebc06c9e90f223c415040de11c5a4c6e8315b",
+        callbackURL: "http://localhost:8080/api/session/github/callback",
+      },
+      async (accessToken, refreshToken, profile, done) => {
+        console.log(
+          "🚀 ~ file: passport.config.js:17 ~ async ~ profile:",
+          profile
+        );
+        try {
+          let user = await userModel.findOne({ email: profile._json?.email });
+          if (!user) {
+            let addNewUser = {
+              first_name: profile._json.name,
+              last_name: "",
+              email: profile._json?.email,
+              age: 0,
+              password: "",
+            };
+            let newUser = await userModel.create(addNewUser);
+            done(null, newUser);
+          } else {
+            // ya existia el usuario
+            done(null, user);
+          }
+        } catch (error) {
+          console.log("🚀 ~ file: passport.config.js:39 ~ error:", error);
+
+          done(error);
         }
       }
     )

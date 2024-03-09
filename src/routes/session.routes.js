@@ -2,7 +2,7 @@ const { Router } = require("express");
 const userModel = require("../dao/models/user.model");
 const { listenerCount } = require("../dao/models/cart.model");
 const { createHash, isValidPasswd } = require("../utils/encrypt");
-
+const passport = require("passport");
 const router = Router();
 
 router.get("/logout", async (req, res) => {
@@ -107,6 +107,25 @@ router.post("/recover-psw", async (req, res) => {
     );
   }
 });
+
+router.get(
+  "/github",
+  passport.authenticate("github", { scope: ["user:email"] }),
+  async (req, res) => {}
+);
+
+router.get(
+  "/github/callback",
+  passport.authenticate("github", { failureRedirect: "/login" }),
+  async (req, res) => {
+    try {
+      req.session.user = req.user;
+      res.redirect("/products");
+    } catch (error) {
+      console.log("🚀 ~ file: session.routes.js:115 ~ error:", error);
+    }
+  }
+);
 
 
 
