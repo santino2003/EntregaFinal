@@ -64,10 +64,11 @@ class CartManagerMongo{
     }
     async createCart(){
        try {
-            await cartModel.create({
+            const cart = await cartModel.create({
                 products: []
+            
             })
-        return
+            return cart._id
        } catch (error) {
             console.log(error)
        }

@@ -1,92 +1,43 @@
 const passport = require("passport");
-const local = require("passport-local");
 const userModel = require("../dao/models/user.model");
-const {createHash, isValidPasswd } = require("../utils/encrypt");
+const jwt = require("passport-jwt");
+const { SECRET_JWT } = require("../utils/jwt");
+
 const GithubStrategy = require("passport-github2")
-const localStrategy = local.Strategy;
+
+
+const JWTStrategy = jwt.Strategy;
+const ExtractJWT = jwt.ExtractJwt;
 
 const initializePassport = () => {
   passport.use(
-    "register",
-    new localStrategy(
+    "jwt",
+    new JWTStrategy(
       {
-        passReqToCallback: true,
-        usernameField: "email",
+        jwtFromRequest:  (req) => {
+          let token = null;
+          if (req && req.cookies) {
+            token = req.cookies.token;
+          }
+          return token;
+        },
+        secretOrKey: SECRET_JWT,
       },
-      async (req, username, password, done) => {
-
-
-        const { first_name, last_name, email, age } = req.body;
-
+      async (jwtPayload, done) => {
+        console.log(
+          "🚀 ~ file: passport.config.js:19 ~ jwtPayload:",
+          jwtPayload
+        );
         try {
-          let user = await userModel.findOne({ email });
-          console.log(user);
-          if (user) {
-            // el usuario existe
-            return done(null, false);
-          }
-          const pswHashed = await createHash(password);
-
-          const addUser = {
-            first_name,
-            last_name,
-            email,
-            age,
-            password: pswHashed,
-          };
-
-          const newUser = await userModel.create(addUser);
-
-          req.session.user = { email, firstName: first_name, lastName: last_name }
-          console.log( "entre passport",req.session.user)
-          if (!newUser) {
-            return res
-              .status(500)
-              .json({ message: `we have some issues register this user` });
-          }
-
-          return done(null, newUser);
+          return done(null, jwtPayload);
         } catch (error) {
-          return done(`error getting user ${error}`);
+          return done(error);
         }
       }
     )
   );
 
-  passport.use(
-    "login",
-    new localStrategy(
-      {
-        passReqToCallback: true,
-        usernameField: "email",
-      },
-      async (req, username, password, done) => {
-        try {
-          const user = await userModel.findOne({ email: username });
-          
-          if (!user) {
-            return done(null, false);
-          }
-
-          console.log(user)
-          if (!isValidPasswd(password, user.password)) {
-            return done(null, false);
-          }
-          req.session.user = {
-  
-            ...user,
-          };
-      
-
-          return done(null, user);
-        } catch (error) {
-          console.log(error);
-
-          // return done(error);
-        }
-      }
-    )
-  );
+    
   passport.use(
     "github",
     new GithubStrategy(

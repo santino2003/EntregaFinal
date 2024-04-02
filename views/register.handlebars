@@ -2,7 +2,7 @@
   <h1>Registro</h1>
 
   <div>
-    <form action="/register" method="post">
+    <form action="api/session/register" method="post">
       <label for="nombre-cliente">Nombre del usuario</label><br />
       <input
         type="text"
@@ -44,6 +44,15 @@
         name="password"
         id="password"
         placeholder="introduzca su contrasena"
+        required
+      />
+      <br />
+      <label for="role">role</label><br />
+      <input
+        type="role"
+        name="role"
+        id="role"
+        placeholder="introduzca su role"
         required
       />
       <br />
