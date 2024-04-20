@@ -1,4 +1,4 @@
-const cartModel = require("../dao/models/cart.model")
+import cartModel from "../models/cart.model.js"
 class CartManagerMongo{
 
     async getProductsCart(id){
@@ -101,4 +101,4 @@ class CartManagerMongo{
     }
 
 }
-module.exports = CartManagerMongo
+export default CartManagerMongo

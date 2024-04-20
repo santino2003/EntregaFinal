@@ -1,6 +1,6 @@
-const { error } = require("console")
-const fs = require("fs/promises")
-const paths = require("path")
+import { error } from "console"
+import fs from "fs/promises.js"
+import paths from "path"
 class CartManager{
     constructor(pathBase){
        this.pathDB = pathBase
@@ -89,4 +89,4 @@ class CartManager{
     }
 }
 
-module.exports = CartManager
+export default CartManager

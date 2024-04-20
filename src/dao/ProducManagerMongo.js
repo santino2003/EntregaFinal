@@ -1,4 +1,4 @@
-const productModel = require("../dao/models/product.model")
+import productModel from "../models/product.model.js"
 class ProductManagerMongo{
     async getProducts (filtro,demasQueris) {
         try {
@@ -59,4 +59,4 @@ class ProductManagerMongo{
     }
 }
 
-module.exports = ProductManagerMongo
+export default ProductManagerMongo

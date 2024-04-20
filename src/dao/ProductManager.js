@@ -1,6 +1,6 @@
-const { error } = require("console")
-const fs = require("fs/promises")
-const paths = require("path")
+import { error } from "console"
+import fs from "fs/promises"
+import paths from "path"
 class ProductManager{
     constructor(pathBase){
        this.pathDB = pathBase
@@ -130,4 +130,4 @@ class ProductManager{
     }
 }
 
-module.exports = ProductManager
+export default ProductManager

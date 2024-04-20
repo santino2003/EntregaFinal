@@ -1,4 +1,4 @@
-const passport = require("passport");
+import passport from "passport";
 
 function handlePolicies(policies) {
   return (req, res, next) => {
@@ -33,4 +33,4 @@ function handlePolicies(policies) {
   };
 }
 
-module.exports = handlePolicies;
+export default handlePolicies;

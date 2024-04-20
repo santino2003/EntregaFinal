@@ -1,15 +1,17 @@
-const { Router } = require("express");
-const sesionController =  require("../controllers/session.controller")
-const handlePolicies = require("../dao/middleware/handle-policies.middleware");
+import { Router } from "express";
+
+import handlePolicies from "../middleware/handle-policies.middleware.js";
 
 const router = Router();
 
+import SessionController from "../controllers/session.controller.js"
 
+const sessionController = new SessionController();
 
-router.post("/login", sesionController.loginController)
+router.post("/login", sessionController.loginController)
 
-router.post("/register",  sesionController.registerController)
-router.get("/current", handlePolicies(["USER","ADMIN"]), sesionController.currentController)
+router.post("/register",  sessionController.registerController)
+router.get("/current", handlePolicies(["USER","ADMIN"]), sessionController.currentController)
 
 
 // router.post("/recover-psw", async (req, res) => {
@@ -63,4 +65,4 @@ router.get("/current", handlePolicies(["USER","ADMIN"]), sesionController.curren
 
 
 
-module.exports = router;
+export default router

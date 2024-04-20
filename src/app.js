@@ -1,29 +1,31 @@
-const path = require("path")
-const express = require( "express");
-const handlebars = require ("express-handlebars");
-const { Server } = require( "socket.io");
-const viewsRouter = require( "./routes/views.router.js")
-const productsRoutes = require("./routes/product.routes")
-const cartRoutes = require("./routes/cart.routes")
-const ProductManager = require('./dao/ProductManager.js')
-const mongoose = require('mongoose');
-const chatModel = require("./dao/models/chat.model")
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+import express from"express";
+import handlebars from "express-handlebars";
+import { Server }from "socket.io";
+import viewsRouter from "./routes/views.router.js"
+import productsRoutes from"./routes/product.routes.js"
+import cartRoutes from "./routes/cart.routes.js"
 
-const sessionRoutes = require("./routes/session.routes");
-const mongoStore = require("connect-mongo");
-const cookieParser = require("cookie-parser");
-const session = require("express-session");
+import mongoose from 'mongoose';
+import chatModel from "./models/chat.model.js"
 
-const pathBase = path.join(__dirname, '/routes/db.json')
-const manager = new ProductManager(pathBase)
+import sessionRoutes from "./routes/session.routes.js";
+import mongoStore from "connect-mongo";
+import cookieParser from "cookie-parser" ;
+import session from "express-session";
 
-const passport = require("passport");
-const initializePassport = require("./config/passport.config");
+
+import passport from "passport";
+import initializePassport from "./config/passport.config.js" ;
+import { PORT ,MONGO_URL} from "./config/config.js";
+
+
 
 
 const app = express()
 
-const PORT = 8080
+
 
 const API_PREFIX = "/api"
 const SECRET_SESSION = "secretSession";
@@ -32,7 +34,7 @@ app.use(cookieParser());
 app.use(
   session({
     store: mongoStore.create({
-      mongoUrl: 'mongodb+srv://santinopeiretti2003:Dexter2003_@cluster0.hrrs9yt.mongodb.net/Moonshop?retryWrites=true&w=majority',
+      mongoUrl: MONGO_URL,
       mongoOptions: { useNewUrlParser: true, useUnifiedTopology: true },
       ttl: 60 * 3600,
     }),
@@ -55,13 +57,17 @@ app.engine("handlebars", handlebars.engine({
   }
 }));
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 app.set("view engine", "handlebars");
 
-app.set("views", path.join(__dirname, "../views"));
+app.set("views", join(dirname(__dirname), "views"));
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
-app.use(express.static(path.join(__dirname, "../public")));
+app.use(express.static(join(dirname(__dirname), 'public')));
+
 app.use(API_PREFIX + "/products",productsRoutes)
 app.use(API_PREFIX + "/carts",cartRoutes)
 app.use(API_PREFIX + "/session/", sessionRoutes)
@@ -72,7 +78,7 @@ app.use("/", viewsRouter);
 
 
 // Conectar a la base de datos
-mongoose.connect('mongodb+srv://santinopeiretti2003:Dexter2003_@cluster0.hrrs9yt.mongodb.net/Moonshop?retryWrites=true&w=majority', {
+mongoose.connect(MONGO_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })

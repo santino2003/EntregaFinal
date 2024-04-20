@@ -1,17 +1,20 @@
-const {Router} = require("express")
-const ProductManager = require('../dao/ProductManager')
-const paths = require("path")
-const ProductManagerMongo = require('../dao/ProducManagerMongo')
-const productModel = require("../dao/models/product.model")
-const CartManagerMongo = require('../dao/CartManagerMongo')
+import {Router} from "express"
+import ProductManager from '../dao/ProductManager.js'
+import paths from "path"
+import ProductManagerMongo from '../dao/ProducManagerMongo.js'
+import productModel from "../models/product.model.js"
+import CartManagerMongo from '../dao/CartManagerMongo.js'
+
+import passport from "passport";
+import handlePolicies from "../middleware/handle-policies.middleware.js";
+
+
+
 const router = Router();
-const pathBase = paths.join(__dirname, 'db.json')
-const manager = new ProductManager(pathBase)
+// const pathBase = paths.join(__dirname, 'db.json')
+// const manager = new ProductManager(pathBase)
 const producManagerMongo = new ProductManagerMongo
 const cartManagerMongo = new CartManagerMongo
-const passport = require("passport");
-const handlePolicies = require("../dao/middleware/handle-policies.middleware");
-
 
 router.get("/", async (req, res) => {
    allProducts = await manager.getProducts()
@@ -92,4 +95,4 @@ router.get("/register",handlePolicies(["PUBLIC"]), async (req, res) => {
 
 
 
-module.exports = router
+export default router
