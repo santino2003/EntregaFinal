@@ -25,4 +25,6 @@ router.put("/:cid/product/:pid",upload,cartController.modifiProductCartControlle
 
 router.delete("/:cid/product/:pid",cartController.deleteProductCartController)
 
+router.get("/:cid/purchase",cartController.purchaseCartController)
+
 export default router

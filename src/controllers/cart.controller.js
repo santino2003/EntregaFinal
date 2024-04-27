@@ -92,6 +92,15 @@ class CartController {
             console.log(error);
         }
     }
+    purchaseCartController = async (req, res) => {
+        try {
+            const id = req.params.cid || req.user.user.cart[0]._id;
+            res.send(await this.cartServices.purchaseCart(id));
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
 }
 
 export default CartController;

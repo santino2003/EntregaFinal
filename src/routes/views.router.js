@@ -33,9 +33,6 @@ router.get("/chat",async(req,res)=>{
   res.render("chat", {})
 })
 
-router.get("/chat",async(req,res)=>{
-  res.render("chat", {})
-})
 
 
 router.get("/products", handlePolicies(["USER","ADMIN"]),async(req,res)=>{

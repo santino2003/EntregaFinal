@@ -43,6 +43,9 @@ class CartRepositoryDao {
     async deleteProducts(cid, pid, quantity) {
         return await this.cartManagerMongo.deleteProducts(cid, pid);
     }
+    async purchaseCart(cid) {
+        return await this.cartManagerMongo.purchaseCart(cid);
+    }
 }
 
 export default CartRepositoryDao;
