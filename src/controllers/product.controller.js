@@ -1,5 +1,7 @@
 
 import { ProductServices } from "../repository/index.js";
+import { generateProduct } from "../utils/generate-product.js";    
+
 
 
 export default class ProductCtrl {
@@ -128,6 +130,21 @@ export default class ProductCtrl {
             } else {
                 return res.send("error");
             }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    mockingProducts = async (req, res) => {
+        try {
+            const products = [1];
+
+            // for (let i = 0; i < 100; i++) {
+            //     const product = generateProduct();
+
+            //     products.push(product);
+            // }
+
+            return res.json(products);
         } catch (error) {
             console.log(error);
         }

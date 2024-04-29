@@ -13,14 +13,15 @@ class SessionRepositoryDao {
 
    createUser = async (userBody, pswHashed)=> {
       const { first_name, last_name, email, age, password, role } = userBody;
-
+        const idCart = await this.cartManagerMongo.createCart();
+        console.log("idCart", idCart)
       const newUser = await userModel.create({
           first_name,
           last_name,
           email,
           age,
           role,
-          cart: await this.cartManagerMongo.createCart(),
+          cart: idCart,
           password: pswHashed,
       });
 

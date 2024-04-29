@@ -14,6 +14,7 @@ import sessionRoutes from "./routes/session.routes.js";
 import mongoStore from "connect-mongo";
 import cookieParser from "cookie-parser" ;
 import session from "express-session";
+import displayRoutes from "express-routemap";
 
 
 import passport from "passport";
@@ -49,7 +50,7 @@ app.use(passport.initialize());
 app.use(passport.session())
 
 
-const httpServer = app.listen(PORT, () => console.log(`Listening on port ${PORT}`))
+const httpServer = app.listen(PORT, () => displayRoutes(app))
 const io = new Server(httpServer);
 app.engine("handlebars", handlebars.engine({ 
   runtimeOptions: {
@@ -140,3 +141,4 @@ io.on("connection",  (socket) => {
 
     
 })  
+

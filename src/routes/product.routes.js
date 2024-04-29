@@ -19,4 +19,5 @@ router.post("/",handlePolicies(["ADMIN"]),upload.none(),productCtrl.addProduct)
 
 router.delete("/:pid" ,handlePolicies(["ADMIN"]),productCtrl.deleteProduct)
 
+router.get("/mockingproducts",productCtrl.mockingProducts)   
 export default router

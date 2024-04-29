@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const ticketCollection = "ticket"
 
-const productSchema = new mongoose.Schema({
+const ticketSchema = new mongoose.Schema({
     code:{
         type: String,
         required: true
@@ -22,3 +22,5 @@ const productSchema = new mongoose.Schema({
     }
 
 })
+
+export default mongoose.model(ticketCollection,ticketSchema)

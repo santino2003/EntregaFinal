@@ -17,7 +17,7 @@ const producManagerMongo = new ProductManagerMongo
 const cartManagerMongo = new CartManagerMongo
 
 router.get("/", async (req, res) => {
-   allProducts = await manager.getProducts()
+   const allProducts = await producManagerMongo.getProducts()
   
   
   res.render("home", {allProducts})
