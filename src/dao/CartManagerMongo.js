@@ -1,12 +1,11 @@
 import cartModel from "../models/cart.model.js"
 import productModel from "../models/product.model.js"
 import ticketModel from "../models/ticket.model.js"
-class CartManagerMongo{
 
+class CartManagerMongo{
     async getProductsCart(id){
         try {
-            const cart = await cartModel.find({})
-            .populate('products.product')
+            const cart =(await cartModel.findOne({_id: id})).products
             
         
             return (cart)
@@ -31,6 +30,7 @@ class CartManagerMongo{
                 console.log(product)
 
                 await cartModel.updateOne({_id:idCart},cart)
+                return("producto actualizado")
             }
 
         }
@@ -48,12 +48,14 @@ class CartManagerMongo{
                     product.quantity -= 1
                     
                     await cartModel.updateOne({_id:idCart},cart)
+                    return("producto eliminado")
                 }
                     
                 else{
                     const index = cart.products.indexOf(product)
                     cart.products.splice(index, 1)
                     await cartModel.updateOne({_id:idCart},cart)
+                    return("producto eliminado")
                     
                 }
             }
@@ -85,6 +87,7 @@ class CartManagerMongo{
                 product.quantity += 1
 
                 await cartModel.updateOne({_id:idCart},cart)
+                return("producto agregado")
                 
             }else{
                 const productoNuevo = {
@@ -95,6 +98,7 @@ class CartManagerMongo{
 
                 cart.products.push(productoNuevo)
                 await cartModel.updateOne({_id:idCart},cart)
+                return("producto agregado")
             }
         }else{
             return(error(404))

@@ -30,7 +30,7 @@ class ProductManagerMongo{
                 thumbnail,
             })
             
-            return
+            return("producto agregado")
             
         } catch (error) {
             console.log(error)
@@ -42,7 +42,7 @@ class ProductManagerMongo{
             await productModel.updateOne(
                 {_id: id},
                 { $set: product })
-                
+            return("producto actualizado")
             
         } catch (error) {
             console.log(error)
@@ -53,6 +53,7 @@ class ProductManagerMongo{
         try {
             await productModel.deleteOne(
                 {_id: id})
+            return("producto eliminado")
         } catch (error) {
             console.log(error)
         }

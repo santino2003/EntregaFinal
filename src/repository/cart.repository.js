@@ -24,11 +24,7 @@ class CartRepositoryDao {
         return product;
     }
 
-    async updateProduct(id, modificacion) {
-        return await this.managerMongo.updateProduct(id, modificacion);
-    }
-
-    async addProductToCart(id, modificacion) {
+    async addProductToCart(cid, pid) {
         return await this.cartManagerMongo.addProductToCart(cid, pid);
     }
 
@@ -40,7 +36,7 @@ class CartRepositoryDao {
         return await this.cartManagerMongo.updateProductQuantity(cid, pid, quantity);
     }
 
-    async deleteProducts(cid, pid, quantity) {
+    async deleteProducts(cid, pid) {
         return await this.cartManagerMongo.deleteProducts(cid, pid);
     }
     async purchaseCart(cid) {

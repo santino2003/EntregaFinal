@@ -1,7 +1,8 @@
 
 import { ProductServices } from "../repository/index.js";
-import { generateProduct } from "../utils/generate-product.js";    
-
+import { DictionaryErrors, HttpResponse } from "../middleware/error-handle.js";
+ 
+const httpResponse = new HttpResponse();
 
 
 export default class ProductCtrl {
@@ -12,7 +13,7 @@ export default class ProductCtrl {
 
     getProducts = async (req, res) => {
         try {
-            console.log("hola")
+            
             let { limit = 4, page = 1, query = {}, sort = {} } = req.query;
 
             if (Object.keys(query).length !== 0) {
@@ -65,23 +66,26 @@ export default class ProductCtrl {
                 nextLink
             });
         } catch (error) {
-            console.log(error);
+            return httpResponse.Error(res, DictionaryErrors.DATABASE_ERROR, error, DictionaryErrors.DATABASE_ERROR)
         }
     }
 
     getProductById = async (req, res) =>{
         try {
             const id = req.params.pid;
+
             if (id) {
                 const product = await this.productServices.getProductById(id);
                 if (product !== undefined) {
                     return res.send(product);
+                }else{
+                    return httpResponse.NotFound(res, DictionaryErrors.INVALID_PARAMS_ERROR, null);
                 }
             } else {
-                return res.status(400).json({ error: 'formato id invalido' });
+                return httpResponse.BadRequest(res, DictionaryErrors.INVALID_PARAMS_ERROR, null);
             }
         } catch (error) {
-            return console.log(error);
+           return httpResponse.Error(res, DictionaryErrors.DATABASE_ERROR, error, DictionaryErrors.DATABASE_ERROR)
         }
     }
 
@@ -92,10 +96,10 @@ export default class ProductCtrl {
                 const product = req.body;
                 return res.send(await this.productServices.updateProduct(id, product));
             } else {
-                return res.status(400).json({ error: 'formato id invalido' });
+               return httpResponse.BadRequest(res, DictionaryErrors.INVALID_PARAMS_ERROR, null);
             }
         } catch (error) {
-            console.log(error);
+            return httpResponse.Error(res, DictionaryErrors.DATABASE_ERROR, error, DictionaryErrors.DATABASE_ERROR)
         }
     }
 
@@ -110,10 +114,10 @@ export default class ProductCtrl {
             if (title !== undefined && description !== undefined && price !== undefined && code !== undefined && stock !== undefined && category !== undefined) {
                 return res.send(await this.productServices.addProduct(title, description, price, code, stock, category, status, thumbnail));
             } else {
-                return res.status(400).json({ error: 'todos los campos son obligatorios' });
+               return httpResponse.BadRequest(res, DictionaryErrors.INVALID_PARAMS_ERROR, null);
             }
         } catch (error) {
-            console.log(error);
+            return httpResponse.Error(res, DictionaryErrors.DATABASE_ERROR, error, DictionaryErrors.DATABASE_ERROR)
         }
     }
 
@@ -125,26 +129,27 @@ export default class ProductCtrl {
                 if (product !== undefined) {
                     return res.send(await this.productServices.deleteProduct(id));
                 } else {
-                    return res.status(404).json({ error: 'El producto no existe' });
+                    return httpResponse.NotFound(res, DictionaryErrors.INVALID_PARAMS_ERROR, null);
                 }
             } else {
-                return res.send("error");
+               return httpResponse.BadRequest(res, DictionaryErrors.INVALID_PARAMS_ERROR, null);
             }
         } catch (error) {
-            console.log(error);
+           return httpResponse.Error(res, DictionaryErrors.DATABASE_ERROR, error, DictionaryErrors.DATABASE_ERROR)
         }
     }
     mockingProducts = async (req, res) => {
         try {
-            const products = [1];
+            // const products = [];
 
             // for (let i = 0; i < 100; i++) {
-            //     const product = generateProduct();
+            //      const product = generateProduct();
 
             //     products.push(product);
-            // }
-
-            return res.json(products);
+            //  }
+            // console.log(products)
+            // return;
+            console.log("mocking products")
         } catch (error) {
             console.log(error);
         }

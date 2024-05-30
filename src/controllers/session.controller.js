@@ -2,8 +2,9 @@
 import { createHash, isValidPasswd } from "../utils/encrypt.js";
 import { generateJWT } from "../utils/jwt.js";
 import CurrentDTO from "../dto/currrent.dto.js";
-
+import { DictionaryErrors, HttpResponse } from "../middleware/error-handle.js";
 import { SessionServices } from "../repository/index.js";
+const httpResponse = new HttpResponse();
 
 
 class SessionController {
@@ -18,12 +19,12 @@ class SessionController {
       const findUser = await this.sessionServices.findUser(email);
   
       if (!findUser) {
-        return res.status(401).json({ message: `este usuario no está registrado` });
+        return httpResponse(res, 401, DictionaryErrors.INVALID_CREDENTIALS);
       }
       
       const isValidComparePsw = await isValidPasswd(password, findUser.password);
       if (!isValidComparePsw) {
-        return res.status(401).json({ message: `credenciales inválidas` });
+        return httpResponse(res, 401, DictionaryErrors.INVALID_CREDENTIALS);  
       }
   
       const {
@@ -49,23 +50,26 @@ class SessionController {
       return res.cookie('token', token, { httpOnly: true }).redirect("/products");
       
     } catch (error) {
-      console.log(error);
+      return httpResponse.Error(res, error.message, null, DictionaryErrors.INTERNAL_SERVER_ERROR);
     }
   }
 
   registerController = async (req, res)=> {
     try {
       const { password } = req.body;
+      if (!password) {
+        return httpResponse.BadRequest(res, DictionaryErrors.INVALID_PARAMS_ERROR, null);
+      }
       const pswHashed = await createHash(password);
       const newUser = await this.sessionServices.createUser(req.body, pswHashed);
       
       if (!newUser) {
-        return res.status(500).json({ message: `tenemos problemas registrando este usuario` });
+       return httpResponse.Error(res, DictionaryErrors.DATABASE_ERROR, null, DictionaryErrors.DATABASE_ERROR);
       }
   
       return res.redirect("/login");
     } catch (error) {
-      console.log(error);
+      return httpResponse.Error(res, error.message, null, DictionaryErrors.INTERNAL_SERVER_ERROR);
     }
   }
 
